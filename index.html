@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>김민영 | 목표와 자기소개</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      background: linear-gradient(135deg, #e8f0ff, #f6eaff);
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      color: #24304a;
+      overflow-x: hidden;
+    }
+
+    .dday-card, .profile-card, .goals-card {
+      width: 100%;
+      max-width: 380px;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(55, 65, 100, 0.10);
+    }
+
+    /* D-day */
+    .dday-card {
+      padding: 22px 16px;
+      text-align: center;
+      background: linear-gradient(135deg, #31689a, #4c8dca);
+      color: #fff;
+    }
+    .dday-number {
+      font-size: clamp(48px, 12vw, 68px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -2px;
+    }
+    .dday-label {
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #eaf3ff;
+    }
+
+    /* Profile card */
+    .profile-card {
+      padding: 32px 22px;
+      text-align: center;
+      background: #fff;
+    }
+    .emoji {
+      margin-bottom: 14px;
+      font-size: 64px;
+      line-height: 1.25;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+    .intro {
+      margin: 0 0 22px;
+      color: #667085;
+      font-size: 15px;
+      line-height: 1.8;
+      overflow-wrap: anywhere;
+      word-break: keep-all;
+    }
+    .tags {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 26px;
+    }
+    .tag {
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #4f46a5;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .github-button {
+      display: inline-block;
+      max-width: 100%;
+      padding: 13px 24px;
+      border-radius: 12px;
+      background: #27334d;
+      color: #fff;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+      transition: background .2s, transform .2s;
+    }
+    .github-button:hover {
+      background: #465778;
+      transform: translateY(-2px);
+    }
+    .github-button:focus-visible, .goal-cell:focus-visible {
+      outline: 3px solid #818cf8;
+      outline-offset: 3px;
+    }
+
+    /* Mandalart goal board */
+    .goals-card {
+      max-width: 520px;
+      padding: 22px 16px 18px;
+      background: #fff;
+    }
+    .goals-heading {
+      margin: 0;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 800;
+      color: #27334d;
+    }
+    .goals-hint {
+      margin: 7px 0 18px;
+      text-align: center;
+      color: #7b8498;
+      font-size: 13px;
+    }
+    .goal-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 5px;
+      width: 100%;
+    }
+    .goal-cell {
+      min-width: 0;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 6px;
+      border: 1px solid #e1e7f0;
+      border-radius: 12px;
+      background: #f4f6fb;
+      color: #46536d;
+      text-align: center;
+      font: inherit;
+      font-size: clamp(10px, 2.8vw, 13px);
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+      word-break: keep-all;
+      cursor: text;
+      white-space: pre-wrap;
+    }
+    .goal-cell:focus {
+      background: #fff;
+      border-color: #6688d9;
+      outline: 2px solid #dbe5ff;
+    }
+    .goal-cell.center {
+      background: #35648c;
+      border-color: #35648c;
+      color: #fff;
+      font-weight: 800;
+    }
+    .goal-cell.center:focus {
+      background: #2b5478;
+    }
+    .save-note {
+      margin: 12px 0 0;
+      text-align: center;
+      font-size: 11px;
+      color: #8992a5;
+    }
+
+    @media (max-width: 360px) {
+      body { padding: 16px 10px 28px; gap: 14px; }
+      .profile-card { padding: 26px 16px; }
+      .goals-card { padding: 18px 10px 14px; }
+      .goal-grid { gap: 4px; }
+      .goal-cell { padding: 4px; border-radius: 9px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- D-day 설정은 아래 JavaScript 맨 위에서 바꿀 수 있습니다. -->
+  <section class="dday-card" aria-label="수능 디데이">
+    <div id="dday-number" class="dday-number">D-Day</div>
+    <div id="dday-label" class="dday-label">수능까지</div>
+  </section>
+
+  <!-- 자기소개 카드 -->
+  <main class="profile-card">
+    <div class="emoji" aria-label="기어 이모지">⚙️</div>
+    <h1>김민영</h1>
+    <p class="intro">기계공학과를 희망하고 있는 2학년 김민영입니다.</p>
+    <div class="tags" aria-label="좋아하는 것">
+      <span class="tag">🏎️ 모터 스포츠</span>
+      <span class="tag">🚗 모빌리티</span>
+      <span class="tag">⚽ 축구</span>
+    </div>
+    <a class="github-button"
+       href="https://github.com/sean-asdf"
+       target="_blank"
+       rel="noopener noreferrer">내 깃허브 ↗</a>
+  </main>
+
+  <!-- 3x3 만다라트: 칸을 클릭하거나 탭한 뒤 바로 수정할 수 있습니다. -->
+  <section class="goals-card">
+    <h2 class="goals-heading">나의 목표</h2>
+    <p class="goals-hint">칸을 눌러서 고칠 수 있어요</p>
+    <div class="goal-grid" id="goal-grid" aria-label="3x3 목표판">
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 1" data-goal="0">규칙적인 생활하기</div>
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 2" data-goal="1">수학 오답노트</div>
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 3" data-goal="2">주 3회 운동</div>
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 4" data-goal="3">독서 월 2권</div>
+      <div class="goal-cell center" contenteditable="true" role="textbox" aria-label="큰 목표" data-goal="4">기계공학과 진학</div>
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 5" data-goal="5">발명 동아리 발표</div>
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 6" data-goal="6">7시간 수면</div>
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 7" data-goal="7">봉사활동 10시간</div>
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 8" data-goal="8">코딩 포트폴리오</div>
+    </div>
+    <p class="save-note">수정 내용은 이 브라우저에 자동 저장됩니다.</p>
+  </section>
+
+  <script>
+    // ===== D-day 설정: 이 두 항목만 수정하세요 =====
+    const TARGET_DATE = "2027-11-18"; // 목표 날짜 (YYYY-MM-DD)
+    const TARGET_LABEL = "수능까지";  // 날짜 아래에 표시할 문구
+    // ================================================
+
+    function updateDday() {
+      const [year, month, day] = TARGET_DATE.split("-").map(Number);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const target = new Date(year, month - 1, day);
+      const diff = Math.round((target.getTime() - today.getTime()) / 86400000);
+      const numberElement = document.getElementById("dday-number");
+      numberElement.textContent = diff > 0 ? `D-${diff}` : diff === 0 ? "D-Day" : `D+${Math.abs(diff)}`;
+      document.getElementById("dday-label").textContent = TARGET_LABEL;
+    }
+    updateDday();
+
+    // 목표판 저장/복원: 수정할 때마다 브라우저의 localStorage에 저장합니다.
+    const goalCells = document.querySelectorAll("[data-goal]");
+    const storageKey = "minyoung-mandalart-goals-v1";
+
+    try {
+      const savedGoals = JSON.parse(localStorage.getItem(storageKey) || "null");
+      if (Array.isArray(savedGoals)) {
+        goalCells.forEach((cell, index) => {
+          if (typeof savedGoals[index] === "string") {
+            cell.textContent = savedGoals[index];
+          }
+        });
+      }
+    } catch (error) {
+      // 저장 기능을 사용할 수 없는 환경에서는 기본 목표를 표시합니다.
+    }
+
+    function saveGoals() {
+      const goals = Array.from(goalCells, cell => cell.innerText.trim());
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(goals));
+      } catch (error) {
+        // 브라우저가 저장을 허용하지 않으면 현재 화면에서만 수정 내용이 유지됩니다.
+      }
+    }
+
+    goalCells.forEach(cell => {
+      cell.addEventListener("input", saveGoals);
+      cell.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          cell.blur();
+        }
+      });
+      cell.addEventListener("paste", event => {
+        event.preventDefault();
+        const text = (event.clipboardData || window.clipboardData).getData("text/plain");
+        document.execCommand("insertText", false, text.replace(/\s*\n\s*/g, " "));
+      });
+    });
+</script>
+</body>
+</html>
