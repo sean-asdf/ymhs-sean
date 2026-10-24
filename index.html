@@ -15,9 +15,9 @@
       flex-direction: column;
       align-items: center;
       gap: 20px;
-      background: linear-gradient(135deg, #e8f0ff, #f6eaff);
+      background: linear-gradient(135deg, #f4f4f4, #e7e7e7);
       font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
-      color: #24304a;
+      color: #202020;
       overflow-x: hidden;
     }
 
@@ -25,14 +25,14 @@
       width: 100%;
       max-width: 380px;
       border-radius: 24px;
-      box-shadow: 0 10px 30px rgba(55, 65, 100, 0.10);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.10);
     }
 
     /* D-day */
     .dday-card {
       padding: 22px 16px;
       text-align: center;
-      background: linear-gradient(135deg, #31689a, #4c8dca);
+      background: linear-gradient(135deg, #111111, #333333);
       color: #fff;
     }
     .dday-number {
@@ -45,7 +45,7 @@
       margin-top: 8px;
       font-size: 14px;
       font-weight: 600;
-      color: #eaf3ff;
+      color: #eeeeee;
     }
 
     /* Profile card */
@@ -67,7 +67,7 @@
     }
     .intro {
       margin: 0 0 22px;
-      color: #667085;
+      color: #666666;
       font-size: 15px;
       line-height: 1.8;
       overflow-wrap: anywhere;
@@ -83,8 +83,8 @@
     .tag {
       padding: 9px 12px;
       border-radius: 999px;
-      background: #eef2ff;
-      color: #4f46a5;
+      background: #eeeeee;
+      color: #333333;
       font-size: 13px;
       font-weight: 600;
     }
@@ -93,7 +93,7 @@
       max-width: 100%;
       padding: 13px 24px;
       border-radius: 12px;
-      background: #27334d;
+      background: #222222;
       color: #fff;
       text-decoration: none;
       font-size: 15px;
@@ -102,11 +102,11 @@
       transition: background .2s, transform .2s;
     }
     .github-button:hover {
-      background: #465778;
+      background: #444444;
       transform: translateY(-2px);
     }
     .github-button:focus-visible, .goal-cell:focus-visible {
-      outline: 3px solid #818cf8;
+      outline: 3px solid #555555;
       outline-offset: 3px;
     }
 
@@ -121,12 +121,12 @@
       text-align: center;
       font-size: 24px;
       font-weight: 800;
-      color: #27334d;
+      color: #222222;
     }
     .goals-hint {
       margin: 7px 0 18px;
       text-align: center;
-      color: #7b8498;
+      color: #777777;
       font-size: 13px;
     }
     .goal-grid {
@@ -142,10 +142,10 @@
       justify-content: center;
       align-items: center;
       padding: 6px;
-      border: 1px solid #e1e7f0;
+      border: 1px solid #d5d5d5;
       border-radius: 12px;
-      background: #f4f6fb;
-      color: #46536d;
+      background: #f2f2f2;
+      color: #444444;
       text-align: center;
       font: inherit;
       font-size: clamp(10px, 2.8vw, 13px);
@@ -157,23 +157,23 @@
     }
     .goal-cell:focus {
       background: #fff;
-      border-color: #6688d9;
-      outline: 2px solid #dbe5ff;
+      border-color: #777777;
+      outline: 2px solid #dddddd;
     }
     .goal-cell.center {
-      background: #35648c;
-      border-color: #35648c;
+      background: #222222;
+      border-color: #222222;
       color: #fff;
       font-weight: 800;
     }
     .goal-cell.center:focus {
-      background: #2b5478;
+      background: #111111;
     }
     .save-note {
       margin: 12px 0 0;
       text-align: center;
       font-size: 11px;
-      color: #8992a5;
+      color: #777777;
     }
 
     @media (max-width: 360px) {
@@ -213,15 +213,15 @@
     <h2 class="goals-heading">나의 목표</h2>
     <p class="goals-hint">칸을 눌러서 고칠 수 있어요</p>
     <div class="goal-grid" id="goal-grid" aria-label="3x3 목표판">
-      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 1" data-goal="0">규칙적인 생활하기</div>
-      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 2" data-goal="1">수학 오답노트</div>
-      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 3" data-goal="2">주 3회 운동</div>
-      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 4" data-goal="3">독서 월 2권</div>
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 1" data-goal="0">규칙적인 생활</div>
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 2" data-goal="1">꾸준한 공부 루틴</div>
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 3" data-goal="2">규칙적인 운동</div>
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 4" data-goal="3">전공 관련 독서</div>
       <div class="goal-cell center" contenteditable="true" role="textbox" aria-label="큰 목표" data-goal="4">기계공학과 진학</div>
       <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 5" data-goal="5">발명 동아리 발표</div>
-      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 6" data-goal="6">7시간 수면</div>
-      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 7" data-goal="7">봉사활동 10시간</div>
-      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 8" data-goal="8">코딩 포트폴리오</div>
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 6" data-goal="6">일정한 수면 패턴</div>
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 7" data-goal="7">과목별 균형</div>
+      <div class="goal-cell" contenteditable="true" role="textbox" aria-label="세부 목표 8" data-goal="8">건강한 마인드</div>
     </div>
     <p class="save-note">수정 내용은 이 브라우저에 자동 저장됩니다.</p>
   </section>
@@ -284,6 +284,6 @@
         document.execCommand("insertText", false, text.replace(/\s*\n\s*/g, " "));
       });
     });
-</script>
+  </script>
 </body>
 </html>
