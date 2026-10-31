@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>두더지 50마리 잡기 게임</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 22px 12px; font-family: Arial, sans-serif;
+      background: #eaf5e9; text-align: center; color: #333;
+    }
+    h1 { color: #356b3e; margin: 4px 0 18px; }
+    .info {
+      display: flex; justify-content: center; flex-wrap: wrap;
+      gap: 10px; margin-bottom: 18px;
+    }
+    .info-box {
+      background: white; border-radius: 13px; padding: 10px 16px;
+      min-width: 90px; box-shadow: 0 3px 8px #00000015;
+    }
+    .info-box p { margin: 0 0 6px; font-size: 13px; color: #777; }
+    .info-box span { font-size: 23px; font-weight: bold; color: #356b3e; }
+    .game-board {
+      display: grid; grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap: clamp(2px, 0.8vw, 7px); width: min( min(94vw, 680px), 680px);
+      margin: 0 auto 20px;
+    }
+    .hole {
+      aspect-ratio: 1; min-width: 0; padding: 0; border: none;
+      border-radius: 50%; background: #93613f;
+      box-shadow: inset 0 4px 0 #70452c; font-size: clamp(12px, 3vw, 30px);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      overflow: hidden; touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .hole.active { background: #b77b4e; }
+    .hole:active { transform: scale(.94); }
+    .hole.hit { background: #7dba78; }
+    #startBtn {
+      border: none; background: #45a45b; color: white; padding: 13px 34px;
+      font-size: 17px; font-weight: bold; border-radius: 30px; cursor: pointer;
+    }
+    #startBtn:disabled { background: #999; cursor: default; }
+    #message { margin-top: 16px; font-size: 16px; font-weight: bold; color: #356b3e; }
+    .hint { margin: 0 auto 12px; color: #647564; font-size: 13px; }
+    @media (max-width: 420px) {
+      body { padding: 16px 7px; }
+      .info-box { min-width: 82px; padding: 9px 10px; }
+      .info-box span { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🐹 두더지 잡기!</h1>
+
+  <div class="info">
+    <div class="info-box"><p>점수</p><span id="score">0</span></div>
+    <div class="info-box"><p>남은 시간</p><span id="time">30</span></div>
+    <div class="info-box"><p>최고 기록</p><span id="best">0</span></div>
+    <div class="info-box"><p>남은 두더지</p><span id="remaining">50</span></div>
+  </div>
+
+  <p class="hint">100칸 중 무작위 2칸에 두더지가 나타납니다!</p>
+  <div class="game-board" id="board" aria-label="10 곱하기 10 두더지 게임판"></div>
+  <button id="startBtn">게임 시작</button>
+  <div id="message">게임 시작 버튼을 눌러주세요!</div>
+
+  <script>
+    const board = document.getElementById("board");
+    const scoreText = document.getElementById("score");
+    const timeText = document.getElementById("time");
+    const bestText = document.getElementById("best");
+    const remainingText = document.getElementById("remaining");
+    const startBtn = document.getElementById("startBtn");
+    const message = document.getElementById("message");
+
+    const HOLE_COUNT = 100;
+    const MOLE_COUNT = 2;
+    const ROUND_INTERVAL = 1000;
+    const holes = [];
+
+    for (let i = 0; i < HOLE_COUNT; i++) {
+      const hole = document.createElement("button");
+      hole.className = "hole";
+      hole.type = "button";
+      hole.setAttribute("aria-label", `${i + 1}번 칸`);
+      hole.addEventListener("click", () => hitMole(i));
+      board.appendChild(hole);
+      holes.push(hole);
+    }
+
+    let score = 0;
+    let time = 30;
+    let activeMoles = new Set();
+    let gameRunning = false;
+    let moleTimer;
+    let countdownTimer;
+    let bestScore = Number(localStorage.getItem("bestScore")) || 0;
+    bestText.textContent = bestScore;
+
+    function updateRemaining() {
+      remainingText.textContent = activeMoles.size;
+    }
+
+    function showMoles() {
+      holes.forEach(hole => {
+        hole.textContent = "";
+        hole.classList.remove("active", "hit");
+      });
+
+      activeMoles = new Set();
+      while (activeMoles.size < MOLE_COUNT) {
+        activeMoles.add(Math.floor(Math.random() * HOLE_COUNT));
+      }
+
+      activeMoles.forEach(index => {
+        holes[index].textContent = "🐹";
+        holes[index].classList.add("active");
+      });
+      updateRemaining();
+    }
+
+    function hitMole(index) {
+      if (!gameRunning || !activeMoles.has(index)) return;
+
+      activeMoles.delete(index);
+      holes[index].textContent = "✨";
+      holes[index].classList.remove("active");
+      holes[index].classList.add("hit");
+
+      score++;
+      scoreText.textContent = score;
+      updateRemaining();
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestText.textContent = bestScore;
+        localStorage.setItem("bestScore", String(bestScore));
+      }
+    }
+
+    function startGame() {
+      clearInterval(moleTimer);
+      clearInterval(countdownTimer);
+
+      score = 0;
+      time = 30;
+      scoreText.textContent = score;
+      timeText.textContent = time;
+      gameRunning = true;
+      startBtn.disabled = true;
+      message.textContent = "두더지 2마리를 잡으세요!";
+      showMoles();
+
+      moleTimer = setInterval(showMoles, ROUND_INTERVAL);
+      countdownTimer = setInterval(() => {
+        time--;
+        timeText.textContent = time;
+        if (time <= 0) endGame();
+      }, 1000);
+    }
+
+    function endGame() {
+      gameRunning = false;
+      clearInterval(moleTimer);
+      clearInterval(countdownTimer);
+
+      holes.forEach(hole => {
+        hole.textContent = "";
+        hole.classList.remove("active", "hit");
+      });
+      activeMoles.clear();
+      updateRemaining();
+
+      startBtn.disabled = false;
+      startBtn.textContent = "다시 시작";
+      message.textContent = `게임 종료! 최종 점수: ${score}점`;
+    }
+
+    startBtn.addEventListener("click", startGame);
+  </script>
+</body>
+</html>
