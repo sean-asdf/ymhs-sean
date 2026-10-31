@@ -1,0 +1,374 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>반응속도 테스트</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f4f4f4;
+        }
+
+        #game {
+            width: 100%;
+            min-height: 100vh;
+            background: #d94343;
+            color: white;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            padding: 25px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        #game.green {
+            background: #269d59;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        #instruction {
+            font-size: 23px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        #result {
+            font-size: 28px;
+            font-weight: bold;
+            min-height: 45px;
+        }
+
+        #round {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        #history {
+            font-size: 16px;
+            line-height: 1.8;
+            margin-top: 20px;
+        }
+
+        #average {
+            font-size: 25px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        #restart {
+            margin-top: 25px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 30px;
+            background: white;
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #restart:active {
+            transform: scale(0.95);
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div id="game">
+
+        <h1>⚡ 반응속도 테스트</h1>
+
+        <div id="round">준비</div>
+
+        <div id="instruction">
+            화면을 터치해서 시작하세요!
+        </div>
+
+        <div id="result"></div>
+
+        <div id="history"></div>
+
+        <div id="average"></div>
+
+        <button id="restart" style="display:none;">
+            다시 시작
+        </button>
+
+    </div>
+
+
+    <script>
+
+        // 1. HTML 요소 가져오기
+
+        const game = document.getElementById("game");
+
+        const roundText = document.getElementById("round");
+
+        const instruction = document.getElementById("instruction");
+
+        const resultText = document.getElementById("result");
+
+        const historyText = document.getElementById("history");
+
+        const averageText = document.getElementById("average");
+
+        const restartBtn = document.getElementById("restart");
+
+
+        // 2. 게임 변수
+
+        let state = "ready";
+
+        let round = 0;
+
+        let results = [];
+
+        let startTime = 0;
+
+        let waitTimer;
+
+
+        // 3. 게임 초기화
+
+        function resetGame() {
+
+            clearTimeout(waitTimer);
+
+            state = "ready";
+
+            round = 0;
+
+            results = [];
+
+            game.classList.remove("green");
+
+            roundText.textContent = "준비";
+
+            instruction.textContent =
+                "화면을 터치해서 시작하세요!";
+
+            resultText.textContent = "";
+
+            historyText.textContent = "";
+
+            averageText.textContent = "";
+
+            restartBtn.style.display = "none";
+
+        }
+
+
+        // 4. 한 라운드 시작
+
+        function startRound() {
+
+            state = "waiting";
+
+            game.classList.remove("green");
+
+            roundText.textContent =
+                "ROUND " + (round + 1) + " / 5";
+
+            instruction.textContent =
+                "초록색이 될 때까지 기다리세요!";
+
+            resultText.textContent = "";
+
+            // 1.5~4초 사이 랜덤 대기
+
+            const randomTime =
+                Math.random() * 2500 + 1500;
+
+            waitTimer = setTimeout(() => {
+
+                // 화면을 초록색으로 변경
+
+                state = "green";
+
+                game.classList.add("green");
+
+                instruction.textContent =
+                    "지금 터치하세요!";
+
+                // 반응속도 측정 시작
+
+                startTime = performance.now();
+
+            }, randomTime);
+
+        }
+
+
+        // 5. 화면 터치 이벤트
+
+        game.addEventListener("pointerdown", (event) => {
+
+            // 다시 시작 버튼을 누른 경우 제외
+
+            if (event.target === restartBtn) return;
+
+            // 결과 화면에서는 터치 무시
+
+            if (state === "finished") return;
+
+
+            // 처음 터치하면 게임 시작
+
+            if (state === "ready") {
+
+                startRound();
+
+                return;
+
+            }
+
+
+            // 빨간색일 때 터치한 경우
+
+            if (state === "waiting") {
+
+                clearTimeout(waitTimer);
+
+                state = "ready";
+
+                game.classList.remove("green");
+
+                instruction.textContent =
+                    "너무 빨라요! 다시 터치해서 시작하세요.";
+
+                resultText.textContent =
+                    "너무 빨라요!";
+
+                return;
+
+            }
+
+
+            // 초록색일 때 터치한 경우
+
+            if (state === "green") {
+
+                const endTime = performance.now();
+
+                const reactionTime =
+                    Math.round(endTime - startTime);
+
+                results.push(reactionTime);
+
+                round++;
+
+                state = "result";
+
+                game.classList.remove("green");
+
+                roundText.textContent =
+                    "ROUND " + round + " / 5";
+
+                instruction.textContent =
+                    "측정 완료!";
+
+                resultText.textContent =
+                    reactionTime + " ms";
+
+                // 5회 기록 표시
+
+                historyText.innerHTML =
+                    results.map((value, index) =>
+                        (index + 1) + "회차 : " + value + " ms"
+                    ).join("<br>");
+
+
+                // 5회 측정 완료
+
+                if (round === 5) {
+
+                    finishGame();
+
+                } else {
+
+                    instruction.textContent =
+                        "화면을 터치하면 다음 라운드가 시작됩니다.";
+
+                }
+
+            }
+
+            // 결과 상태에서 다음 라운드 시작
+
+            else if (state === "result") {
+
+                startRound();
+
+            }
+
+        });
+
+
+        // 6. 최종 결과 계산
+
+        function finishGame() {
+
+            state = "finished";
+
+            const sum = results.reduce(
+                (total, value) => total + value, 0
+            );
+
+            const avg = Math.round(sum / results.length);
+
+            instruction.textContent =
+                "5회 측정이 완료되었습니다!";
+
+            resultText.textContent =
+                "평균 반응속도";
+
+            averageText.textContent =
+                avg + " ms";
+
+            restartBtn.style.display = "block";
+
+        }
+
+
+        // 7. 다시 시작 버튼
+
+        restartBtn.addEventListener("click", (event) => {
+
+            event.stopPropagation();
+
+            resetGame();
+
+        });
+
+
+        // 처음 실행
+
+        resetGame();
+
+    </script>
+
+</body>
+</html>
