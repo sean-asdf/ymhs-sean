@@ -1,0 +1,529 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>롤 챔피언 이름 맞히기</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background: #101820;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            color: #d4b46a;
+            margin-bottom: 10px;
+        }
+
+        #game {
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        #progress {
+            color: #aaa;
+            margin: 20px 0;
+            font-size: 17px;
+        }
+
+        #championImage {
+            width: 100%;
+            max-width: 280px;
+            height: 280px;
+            object-fit: contain;
+            border-radius: 15px;
+            margin: 10px auto 20px;
+            filter: blur(12px);
+            transition: filter 0.3s;
+        }
+
+        #championImage.clear {
+            filter: blur(0);
+        }
+
+        #question {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        #choices {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .choice {
+            padding: 17px 8px;
+            border: 2px solid #b99b5b;
+            border-radius: 10px;
+            background: #202d38;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .choice:disabled {
+            cursor: default;
+            opacity: 1;
+        }
+
+        .choice.correct {
+            background: #267b49;
+            border-color: #45d47a;
+        }
+
+        .choice.wrong {
+            background: #8b3030;
+            border-color: #ff6464;
+        }
+
+        #feedback {
+            min-height: 35px;
+            margin: 20px 0;
+            font-size: 19px;
+            font-weight: bold;
+        }
+
+        #nextBtn, #restartBtn {
+            padding: 14px 35px;
+            border: none;
+            border-radius: 25px;
+            background: #d4b46a;
+            color: #101820;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        #nextBtn {
+            display: none;
+        }
+
+        #resultScreen {
+            display: none;
+            padding-top: 60px;
+        }
+
+        #finalScore {
+            font-size: 30px;
+            color: #d4b46a;
+            margin: 30px 0;
+        }
+
+        #loading {
+            margin-top: 50px;
+            color: #d4b46a;
+        }
+
+        #error {
+            color: #ff7777;
+            margin-top: 25px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div id="game">
+
+        <h1>⚔️ LOL 챔피언 퀴즈</h1>
+
+        <p id="loading">챔피언 데이터를 불러오는 중...</p>
+
+        <div id="quiz" style="display:none;">
+
+            <div id="progress">1 / 10</div>
+
+            <img id="championImage" src="" alt="챔피언 이미지">
+
+            <div id="question">
+                이 챔피언의 이름은?
+            </div>
+
+            <div id="choices"></div>
+
+            <div id="feedback"></div>
+
+            <button id="nextBtn">다음 문제</button>
+
+        </div>
+
+        <div id="resultScreen">
+
+            <h2>🎉 퀴즈 완료!</h2>
+
+            <div id="finalScore"></div>
+
+            <p id="resultMessage"></p>
+
+            <button id="restartBtn">다시 하기</button>
+
+        </div>
+
+        <p id="error"></p>
+
+    </div>
+
+
+    <script>
+
+        // 1. API 주소 설정
+
+        const API_URL =
+            "https://ddragon.leagueoflegends.com/cdn/16.17.1/data/ko_KR/champion.json";
+
+        const IMAGE_URL =
+            "https://ddragon.leagueoflegends.com/cdn/16.17.1/img/champion/";
+
+
+        // 2. HTML 요소 가져오기
+
+        const loading = document.getElementById("loading");
+
+        const quiz = document.getElementById("quiz");
+
+        const championImage =
+            document.getElementById("championImage");
+
+        const progress = document.getElementById("progress");
+
+        const choices = document.getElementById("choices");
+
+        const feedback = document.getElementById("feedback");
+
+        const nextBtn = document.getElementById("nextBtn");
+
+        const resultScreen =
+            document.getElementById("resultScreen");
+
+        const finalScore =
+            document.getElementById("finalScore");
+
+        const resultMessage =
+            document.getElementById("resultMessage");
+
+        const errorText = document.getElementById("error");
+
+
+        // 3. 게임 변수
+
+        let champions = [];
+
+        let questions = [];
+
+        let currentQuestion = 0;
+
+        let score = 0;
+
+        let answered = false;
+
+
+        // 4. 챔피언 데이터 가져오기
+
+        async function loadChampions() {
+
+            try {
+
+                const response = await fetch(API_URL);
+
+                if (!response.ok) {
+                    throw new Error("API 요청 실패");
+                }
+
+                const data = await response.json();
+
+                // 객체를 배열로 변환
+
+                champions = Object.values(data.data);
+
+                // 게임 시작
+
+                startGame();
+
+            } catch (error) {
+
+                loading.textContent =
+                    "데이터를 불러오지 못했습니다.";
+
+                errorText.textContent =
+                    "인터넷 연결을 확인하고 페이지를 새로고침하세요.";
+
+                console.error(error);
+
+            }
+
+        }
+
+
+        // 5. 배열 섞기
+
+        function shuffle(array) {
+
+            return [...array].sort(() => Math.random() - 0.5);
+
+        }
+
+
+        // 6. 문제 10개 만들기
+
+        function makeQuestions() {
+
+            // 챔피언 10명 랜덤 선택
+
+            const selected = shuffle(champions).slice(0, 10);
+
+            questions = selected.map(champion => {
+
+                // 정답 1개 + 오답 3개
+
+                const wrongAnswers = shuffle(
+                    champions.filter(c => c.id !== champion.id)
+                ).slice(0, 3);
+
+                // 보기 4개 섞기
+
+                const options = shuffle([
+                    champion,
+                    ...wrongAnswers
+                ]);
+
+                return {
+                    answer: champion,
+                    options: options
+                };
+
+            });
+
+        }
+
+
+        // 7. 게임 시작
+
+        function startGame() {
+
+            currentQuestion = 0;
+
+            score = 0;
+
+            answered = false;
+
+            makeQuestions();
+
+            loading.style.display = "none";
+
+            resultScreen.style.display = "none";
+
+            quiz.style.display = "block";
+
+            showQuestion();
+
+        }
+
+
+        // 8. 문제 화면 표시
+
+        function showQuestion() {
+
+            answered = false;
+
+            const question = questions[currentQuestion];
+
+            const answer = question.answer;
+
+            progress.textContent =
+                (currentQuestion + 1) + " / 10";
+
+            // 챔피언 이미지 표시
+
+            championImage.src =
+                IMAGE_URL + answer.image.full;
+
+            // 이미지 흐리게 만들기
+
+            championImage.classList.remove("clear");
+
+            feedback.textContent = "";
+
+            nextBtn.style.display = "none";
+
+            // 기존 보기 삭제
+
+            choices.innerHTML = "";
+
+            // 새로운 보기 4개 생성
+
+            question.options.forEach(option => {
+
+                const button = document.createElement("button");
+
+                button.className = "choice";
+
+                button.textContent = option.name;
+
+                button.addEventListener("click", () => {
+
+                    checkAnswer(option, button);
+
+                });
+
+                choices.appendChild(button);
+
+            });
+
+        }
+
+
+        // 9. 정답 확인
+
+        function checkAnswer(selected, selectedButton) {
+
+            if (answered) return;
+
+            answered = true;
+
+            const correct =
+                questions[currentQuestion].answer;
+
+            // 이미지 선명하게 만들기
+
+            championImage.classList.add("clear");
+
+            // 모든 버튼 비활성화
+
+            const buttons =
+                document.querySelectorAll(".choice");
+
+            buttons.forEach(button => {
+
+                button.disabled = true;
+
+                // 정답 표시
+
+                if (button.textContent === correct.name) {
+
+                    button.classList.add("correct");
+
+                }
+
+            });
+
+
+            // 정답인지 확인
+
+            if (selected.id === correct.id) {
+
+                score++;
+
+                feedback.textContent = "⭕ 정답입니다!";
+
+            } else {
+
+                selectedButton.classList.add("wrong");
+
+                feedback.textContent =
+                    "❌ 오답! 정답은 " + correct.name + "입니다.";
+
+            }
+
+            // 다음 문제 버튼 표시
+
+            if (currentQuestion === 9) {
+
+                nextBtn.textContent = "결과 확인";
+
+            } else {
+
+                nextBtn.textContent = "다음 문제";
+
+            }
+
+            nextBtn.style.display = "inline-block";
+
+        }
+
+
+        // 10. 다음 문제로 이동
+
+        nextBtn.addEventListener("click", () => {
+
+            currentQuestion++;
+
+            if (currentQuestion < 10) {
+
+                showQuestion();
+
+            } else {
+
+                showResult();
+
+            }
+
+        });
+
+
+        // 11. 최종 결과
+
+        function showResult() {
+
+            quiz.style.display = "none";
+
+            resultScreen.style.display = "block";
+
+            finalScore.textContent =
+                score + " / 10점";
+
+            if (score === 10) {
+
+                resultMessage.textContent =
+                    "완벽합니다! 챔피언 전문가네요.";
+
+            } else if (score >= 7) {
+
+                resultMessage.textContent =
+                    "훌륭합니다! 롤을 잘 알고 있네요.";
+
+            } else if (score >= 4) {
+
+                resultMessage.textContent =
+                    "괜찮은 실력입니다!";
+
+            } else {
+
+                resultMessage.textContent =
+                    "챔피언을 더 알아볼까요?";
+
+            }
+
+        }
+
+
+        // 12. 다시 하기
+
+        document.getElementById("restartBtn")
+            .addEventListener("click", startGame);
+
+
+        // 게임 실행
+
+        loadChampions();
+
+    </script>
+
+</body>
+</html>
